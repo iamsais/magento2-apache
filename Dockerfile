@@ -4,29 +4,29 @@ MAINTAINER sathish26586@gmail.com
 
 RUN apt-get update && \
     apt-get install -y \
-        nginx \
+        apache2 \
         wget \
         nano \
         composer \
-        php7.0-fpm \
-        php7.0-mcrypt \
-        php7.0-curl \
-        php7.0-cli \
-        php7.0-mysql \
-        php7.0-gd \
-        php7.0-xsl \
-        php7.0-json \
-        php7.0-intl \
+        php \
+        libapache2-mod-php \
+        php-mcrypt \
+        php-curl \
+        php-cli \
+        php-mysql \
+        php-gd \
+        php-xsl \
+        php-json \
+        php-intl \
         php-pear \
-        php7.0-dev \
-        php7.0-common \
-        php7.0-mbstring \
-        php7.0-zip \
+        php-dev \
+        php-common \
+        php-mbstring \
+        php-zip \
         php-soap \
         libcurl3 \
         curl \
-        php7.0-bcmath \
-        supervisor
+        php-bcmath
 
 RUN git clone https://github.com/edenhill/librdkafka.git && \
 	cd librdkafka && \
@@ -37,15 +37,12 @@ RUN git clone https://github.com/edenhill/librdkafka.git && \
 # clear apt cache and remove unnecessary packages
 RUN apt-get autoclean && apt-get -y autoremove
 
-COPY php-fpm/php.ini /etc/php/7.0/fpm/
-COPY php-cli/php.ini /etc/php/7.0/cli/
 COPY rdkafka.ini /etc/php/7.0/mods-available/
 
-RUN rm /etc/nginx/sites-enabled/default
+# Move Apache2 conf file
+COPY apache2.conf /etc/apache2/
 
-COPY magento2 /etc/nginx/sites-available
-RUN ln -s /etc/nginx/sites-available/magento2 /etc/nginx/sites-enabled/
+# To enable htaccess rewrite rules
+RUN a2enmod_rewrite
 
-COPY supervisor-app.conf /etc/supervisor/conf.d/
-
-CMD ["supervisord", "-n"]
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
