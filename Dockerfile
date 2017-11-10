@@ -28,21 +28,21 @@ RUN apt-get update && \
         curl \
         php-bcmath
 
-RUN git clone https://github.com/edenhill/librdkafka.git && \
-	cd librdkafka && \
-	./configure && make && make install && \
-	ls -l /usr/local/lib/ && \
-	pecl install rdkafka
+RUN apt-get install -y librdkafka-dev
+RUN pecl install rdkafka
+
+RUN useradd -m -d /var/www/html/ webdata -s /bin/bash && usermod -a -G www-data webdata
 
 # clear apt cache and remove unnecessary packages
 RUN apt-get autoclean && apt-get -y autoremove
 
 COPY rdkafka.ini /etc/php/7.0/mods-available/
+COPY 20-rdkafka.ini /etc/php/7.0/apache2/conf.d/
 
 # Move Apache2 conf file
 COPY apache2.conf /etc/apache2/
 
 # To enable htaccess rewrite rules
-RUN a2enmod_rewrite
+RUN a2enmod rewrite
 
 CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
