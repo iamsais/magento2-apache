@@ -1,6 +1,6 @@
 FROM ubuntu:16.10
 
-MAINTAINER sathish26
+MAINTAINER sathish26586@gmail.com
 
 RUN apt-get update && \
     apt-get install -y \
